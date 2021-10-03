@@ -3,25 +3,13 @@ import { DataSchema } from "../types/types";
 
 interface OverlayProps {
   overlayVisible: boolean;
-  selectedCoords: [number, number];
+  selectedCoordData: DataSchema;
 }
 
 const Overlay: React.FC<OverlayProps> = ({
   overlayVisible,
-  selectedCoords,
+  selectedCoordData,
 }) => {
-  const [coordData, setCoordData] = useState<DataSchema>();
-
-  useEffect(() => {
-    async function fetchCoordData(coords: [number, number]) {
-      const response = await fetch(
-        `http://localhost:5000/latlon/${coords[1]}_${coords[0]}`
-      );
-      setCoordData(await response.json());
-    }
-    fetchCoordData(selectedCoords);
-  }, [selectedCoords]);
-
   return (
     <div
       style={{
@@ -33,7 +21,55 @@ const Overlay: React.FC<OverlayProps> = ({
         backgroundColor: "white",
       }}
     >
-      <p>{`${selectedCoords[0]}, ${selectedCoords[1]}`}</p>
+      <p>
+        {selectedCoordData
+          ? `${selectedCoordData.lon}, ${selectedCoordData.lat}`
+          : ""}
+      </p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          //   backgroundColor: "red",
+        }}
+      >
+        <div style={{ width: "50%", textAlign: "center" }}>
+          <p style={{ fontWeight: 600, fontSize: 20 }}>Slope angle</p>
+          <p style={{ fontSize: 28 }}>
+            {selectedCoordData
+              ? (selectedCoordData.slope / 100).toString() + "°"
+              : ""}
+          </p>
+        </div>
+        <div style={{ width: "50%", textAlign: "center" }}>
+          <p style={{ fontWeight: 600, fontSize: 20 }}>Aspect</p>
+          <p style={{ fontSize: 28 }}>
+            {selectedCoordData
+              ? (selectedCoordData.aspect / 100).toString() + "°"
+              : ""}
+          </p>
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <div style={{ width: "50%", textAlign: "center" }}>
+          <p style={{ fontWeight: 600, fontSize: 20 }}>
+            Distance to Geological Boundary
+          </p>
+          <p style={{ fontSize: 28 }}>
+            {selectedCoordData
+              ? selectedCoordData.distGeo.toString() + "km"
+              : ""}
+          </p>
+        </div>
+        <div style={{ width: "50%", textAlign: "center" }}>
+          <p style={{ fontWeight: 600, fontSize: 20 }}>Aspect</p>
+          <p style={{ fontSize: 28 }}>
+            {selectedCoordData
+              ? (selectedCoordData.aspect / 100).toString() + "°"
+              : ""}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

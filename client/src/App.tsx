@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import DeckGL from "@deck.gl/react";
-import { ScreenGridLayer } from "@deck.gl/aggregation-layers";
+import { ScatterplotLayer } from "@deck.gl/layers";
 import { StaticMap } from "react-map-gl";
 import { DataSchema } from "./types/types";
 import Overlay from "./components/Overlay";
@@ -19,33 +18,31 @@ const INITIAL_VIEW_STATE = {
 };
 
 const App: React.FC = () => {
-  const [data, setData] = useState([]);
-  const [selectedCoords, setSelectedCoords] = useState([0, 0] as [
-    number,
-    number
-  ]);
+  // const [data, setData] = useState([]);
+  const [selectedCoordData, setSelectedCoordData] = useState<DataSchema>();
   const [overlayVisible, setOverlayVisible] = useState(false);
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await fetch("http://localhost:5000");
-      setData(await response.json());
-    }
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const response = await fetch("http://localhost:5000/data");
+  //     setData(await response.json());
+  //   }
+  //   fetchData();
+  // }, []);
 
   const layers = [
-    new ScreenGridLayer({
-      id: "screengrid-layer",
+    new ScatterplotLayer({
+      id: "scatterplot-layer",
       data,
       pickable: true,
       opacity: 0.4,
-      cellSizePixels: 10,
-      getPosition: (d: DataSchema) => [d.lat, d.lon],
-      getWeight: (d) => d.slope, //! change later
+      filled: true,
+      radiusScale: 1000,
+      getPosition: (d: any) => [parseFloat(d.lat), parseFloat(d.lon)],
+      // getWeight: (d) => parseFloat(d.slope), //! change later
       onClick: (info, event) => {
-        console.log(info.coordinate);
-        setSelectedCoords(info.coordinate as [number, number]);
+        console.log(info);
+        setSelectedCoordData(info.object as DataSchema);
         setOverlayVisible(true);
       },
     }),
@@ -62,7 +59,7 @@ const App: React.FC = () => {
       </DeckGL>
       <Overlay
         overlayVisible={overlayVisible}
-        selectedCoords={selectedCoords}
+        selectedCoordData={selectedCoordData!}
       />
     </div>
   );
