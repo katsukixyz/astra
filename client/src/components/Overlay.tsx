@@ -57,15 +57,15 @@ const Overlay: React.FC<OverlayProps> = ({
           </p>
           <p style={{ fontSize: 28 }}>
             {selectedCoordData
-              ? selectedCoordData.distGeo.toString() + "km"
+              ? selectedCoordData.dist_geo.toString() + "km"
               : ""}
           </p>
         </div>
         <div style={{ width: "50%", textAlign: "center" }}>
-          <p style={{ fontWeight: 600, fontSize: 20 }}>Aspect</p>
+          <p style={{ fontWeight: 600, fontSize: 20 }}>Distance to Fault</p>
           <p style={{ fontSize: 28 }}>
             {selectedCoordData
-              ? (selectedCoordData.aspect / 100).toString() + "°"
+              ? (selectedCoordData.dist_fault / 100).toString() + "km"
               : ""}
           </p>
         </div>

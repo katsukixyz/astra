@@ -1,9 +1,9 @@
 export type DataSchema = {
-    lon: number;
-    lat: number;
-    distGeo: number;
-    distFault: number;
-    slope: number;
-    aspect: number;
-    risk?: number;
-}
+  lon: number;
+  lat: number;
+  dist_geo: number;
+  dist_fault: number;
+  slope: number;
+  aspect: number;
+  prob_landslide: number;
+};
