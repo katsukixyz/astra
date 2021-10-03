@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import DeckGL from "@deck.gl/react";
-import { LineLayer } from "@deck.gl/layers";
+import { ScreenGridLayer } from "@deck.gl/aggregation-layers";
 import { StaticMap } from "react-map-gl";
-import model from "./data.json";
+import { DataSchema } from "./types/types";
+import Overlay from "./components/Overlay";
+import data from "./data.js";
 
 const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -16,20 +18,36 @@ const INITIAL_VIEW_STATE = {
   bearing: 0,
 };
 
-const data = [
-  {
-    sourcePosition: [-122.41669, 37.7853],
-    targetPosition: [-122.41669, 37.781],
-  },
-];
-
 const App: React.FC = () => {
+  const [data, setData] = useState([]);
+  const [selectedCoords, setSelectedCoords] = useState([0, 0] as [
+    number,
+    number
+  ]);
+  const [overlayVisible, setOverlayVisible] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch("http://localhost:5000");
+      setData(await response.json());
+    }
+    fetchData();
+  }, []);
+
   const layers = [
-    new LineLayer({
-      id: "line-layer",
+    new ScreenGridLayer({
+      id: "screengrid-layer",
       data,
       pickable: true,
-      onClick: (info, event) => console.log(info),
+      opacity: 0.4,
+      cellSizePixels: 10,
+      getPosition: (d: DataSchema) => [d.lat, d.lon],
+      getWeight: (d) => d.slope, //! change later
+      onClick: (info, event) => {
+        console.log(info.coordinate);
+        setSelectedCoords(info.coordinate as [number, number]);
+        setOverlayVisible(true);
+      },
     }),
   ];
 
@@ -38,11 +56,14 @@ const App: React.FC = () => {
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        // onClick={(r) => console.log(r)}
         layers={layers}
       >
         <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
       </DeckGL>
+      <Overlay
+        overlayVisible={overlayVisible}
+        selectedCoords={selectedCoords}
+      />
     </div>
   );
 };
