@@ -1,2 +1,9 @@
 .env
 node_modules
+.DS_Store
+*.zip
+*.hgt
+*.slope
+*.aspect
+*.csv
+*-checkpoint.ipynb
